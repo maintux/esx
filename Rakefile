@@ -7,11 +7,11 @@ Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.version = ESX::VERSION
   gem.name = "esx"
-  gem.homepage = "http://github.com/rubiojr/esx"
+  gem.homepage = "http://github.com/maintux/esx"
   gem.license = "MIT"
   gem.summary = %Q{Simple RbVmomi wrapper library to manage VMWare ESX hosts}
   gem.description = %Q{Manage VMWare ESX hosts with ease}
-  gem.email = "rubiojr@frameos.org"
+  gem.email = "maintux@gmail.com"
   gem.authors = ["Sergio Rubio","Massimo Maino"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
   # and development dependencies are only needed for development (ie running rake tasks, tests, etc)

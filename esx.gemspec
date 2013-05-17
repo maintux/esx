@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.authors = ["Sergio Rubio", "Massimo Maino"]
   s.date = "2013-03-29"
   s.description = "Manage VMWare ESX hosts with ease"
-  s.email = "rubiojr@frameos.org"
+  s.email = "maintux@gmail.com"
   s.executables = ["esx"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
     "spec/unit/vm_spec.rb",
     "templates/vmx_template.erb"
   ]
-  s.homepage = "http://github.com/rubiojr/esx"
+  s.homepage = "http://github.com/maintux/esx"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.25"

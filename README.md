@@ -1,6 +1,6 @@
 # ESX
 
-Simple rbvmomi wrapper to manage VMWare ESX hosts. 
+Simple rbvmomi wrapper to manage VMWare ESX hosts.
 
 The goal of the library is to keep things simple so vCenter support isn't planned.
 
@@ -9,7 +9,7 @@ If you want a full VMWare vSphere API ruby implementation have a look at https:/
 # Installation
 
 ## Ubuntu/Debian
-  
+
   apt-get install libxml2-dev libxslt-dev gcc make rubygems
   gem install esx
 
@@ -42,7 +42,7 @@ Sample output:
     Power State:      poweredOn
     Hosted VMs:       2
     Running VMs:      1
-    
+
     Virtual Machines:
     +-------------------------+--------+------+------+-------+------------+
     | NAME                    | MEMORY | CPUS | NICS | DISKS | STATE      |
@@ -50,7 +50,7 @@ Sample output:
     | foobar                  | 128    | 1    | 1    | 1     | poweredOn  |
     | foobar2                 | 256    | 2    | 1    | 1     | poweredOff |
     +-------------------------+--------+------+------+-------+------------+
-    
+
     Datastores:
     +------------+--------------+--------------+-----------+------+---------------------------------------------------+
     | NAME       | CAPACITY     | FREESPACE    | ACCESIBLE | TYPE | URL                                               |
@@ -59,17 +59,17 @@ Sample output:
     | datastore1 | 141465485312 | 20716716032  | VMFS      | true | /vmfs/volumes/4e6117e7-35c82a3e-ba79-5cf3fc9699c2 |
     +------------+--------------+--------------+-----------+------+---------------------------------------------------+
 
-__esx create-vm --user root --password foo --name esx-rubiojr --disk-file /path/to/file.vmdk --datastore datastore1 --memory 2048 --poweron 10.10.0.2__
+__esx create-vm --user root --password foo --name esx-maintux --disk-file /path/to/file.vmdk --datastore datastore1 --memory 2048 --poweron 10.10.0.2__
 
 # Using the library
 
     require 'rubygems'
     require 'lib/esx.rb'
-    
-    
+
+
     # Connect to the ESX Host
     host = ESX::Host.connect 'my-esx-host', 'root', 'secret'
-    
+
     # Print hypervisor info
     puts
     name = host.name.upcase
@@ -80,27 +80,27 @@ __esx create-vm --user root --password foo --name esx-rubiojr --disk-file /path/
     puts "Memory Usage:     %s" % host.memory_usage.bytes.to.megabytes.to_i
     puts "Cpu Cores:        %s" % host.cpu_cores
     puts "Power State:      %s" % host.power_state
-    
+
     # Create a VM with 4GB disk, 128 MB mem, e1000 nic, 1CPU in datastore1
     vm = host.create_vm :vm_name => 'foobar'
-    
+
     # Create a VM with 5GB disk, 256 MB mem, e1000 nic, 1CPU in datastore2
     vm = host.create_vm :vm_name => 'foobar2', :disk_size => 5000, :cpus => 2, :memory => 256, :datastore => 'datastore2'
-    
-    
+
+
     host.virtual_machines.each do |vm|
-    
+
       # PowerOff the VM if powered On
       vm.power_off if (vm.name =~ /foobar/ and vm.power_state == 'poweredOn')
-    
+
       # Destroy the VM if name matches foobar
       if vm.name =~ /foobar.*/
         vm.destroy
       end
-    
+
     end
 
-# Testing 
+# Testing
 
 Run 'bundler install' to install required deps.
 
@@ -108,5 +108,5 @@ Run rspec from the base dir. By default, the tests try to connect to an ESX host
 
 # Copyright
 
-Copyright (c) 2011 Sergio Rubio. See LICENSE.txt for
+Copyright (c) 2011 Sergio Rubio, Massimo Maino. See LICENSE.txt for
 further details.
