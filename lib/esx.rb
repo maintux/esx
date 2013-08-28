@@ -125,6 +125,7 @@ module ESX
     def create_vm(specification)
       spec = specification
       spec[:cpus] = (specification[:cpus] || 1).to_i
+      spec[:cpu_cores] = (specification[:cpu_cores] || 1).to_i
       spec[:guest_id] = specification[:guest_id] || 'otherGuest'
       if specification[:disk_size]
         spec[:disk_size] = (specification[:disk_size].to_i * 1024)
@@ -142,6 +143,7 @@ module ESX
         :guestId => spec[:guest_id],
         :files => { :vmPathName => spec[:datastore] },
         :numCPUs => spec[:cpus],
+        :numCoresPerSocket => spec[:cpu_cores],
         :memoryMB => spec[:memory],
         :deviceChange => [
           {
