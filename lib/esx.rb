@@ -562,6 +562,10 @@ module ESX
       list
     end
 
+    def rename(new_name)
+      vm_object.Rename_Task ({"newName" => new_name})
+    end
+
   end
 
   class NetworkInterface

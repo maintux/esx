@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "esx"
-  s.version = "0.4.5"
+  s.version = "0.4.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Sergio Rubio", "Massimo Maino"]
@@ -92,4 +92,3 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<clamp>, [">= 0"])
   end
 end
-
