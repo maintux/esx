@@ -547,6 +547,13 @@ module ESX
       guest_info.ip_address
     end
 
+    #
+    # Shortcut to GuestInfo.host_name
+    #
+    def host_name
+      guest_info.host_name
+    end
+
     def nics
       list = []
       vm_object.config.hardware.device.grep(RbVmomi::VIM::VirtualEthernetCard).each do |n|
@@ -597,6 +604,10 @@ module ESX
 
     def ip_address
       _wrapped_object.ipAddress
+    end
+
+    def host_name
+      _wrapped_object.hostName
     end
 
     def nics
