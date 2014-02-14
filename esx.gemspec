@@ -54,6 +54,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<simplecov>, [">= 0"])
       s.add_runtime_dependency(%q<alchemist>, [">= 0"])
+      s.add_runtime_dependency(%q<nokogiri>, ["1.5.5"])
       s.add_runtime_dependency(%q<rbvmomi>, [">= 0"])
       s.add_runtime_dependency(%q<terminal-table>, [">= 0"])
       s.add_runtime_dependency(%q<net-ssh>, [">= 0"])

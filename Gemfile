@@ -8,6 +8,7 @@ source "http://rubygems.org"
 group :development do
   gem "net-ssh"
   gem "net-scp"
+  gem "nokogiri", "1.5.5"
   gem "rbvmomi"
   gem "alchemist"
   gem "rspec", ">= 0"
