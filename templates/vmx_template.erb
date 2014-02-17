@@ -1,6 +1,6 @@
 .encoding = "UTF-8"
 config.version = "8"
-virtualHW.version = "7"
+virtualHW.version = "<%= spec[:hw_version] %>"
 vmci0.present = "true"
 displayName = "<%= spec[:vm_name] %>"
 numvcpus = "<%= spec[:cpus] %>"

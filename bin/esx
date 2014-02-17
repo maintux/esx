@@ -295,6 +295,7 @@ class CreateVMCommand < BaseCommand
   option "--tmpdir", "TMP DIR", "tmp dir used to download files", :default => "/tmp"
   option "--datastore", "DATASTORE", "Datastore used to host the disk", :default => "datastore1"
   option "--poweron", :flag, "Power on the VM after creation"
+  option "--hw-version", "HW_VERSION", "Virtual hardware version", default: 10
 
   def execute
     begin
@@ -356,7 +357,8 @@ class CreateVMCommand < BaseCommand
       vm = host.create_vm :vm_name => name,
                           :disk_file => "#{name}/#{name}.vmdk",
                           :datastore => datastore, :disk_type => :flat, :memory => memory,
-                          :guest_id => guest_id, :nics => [{mac_address => mac_address, :network => vm_network}]
+                          :guest_id => guest_id, :nics => [{mac_address => mac_address, :network => vm_network}],
+                          :hw_version => hw_version
     end
     if poweron?
       vm.power_on
