@@ -286,6 +286,8 @@ class CreateVMCommand < BaseCommand
 
   parameter "ADDRESS", "ESX host address"
   option "--disk-file", "DISK_FILE", "VMDK file to import", :attribute_name => :disk_file
+  option "--use-disk-template", :flag, "Use disk template and clone from it or save if it doesn't exist",
+    default: false
   option "--disk-size", "DISK_SIZE", "VM Disk size in MB", :attribute_name => :disk_size, :default => 8192
   option "--guest-id", "GUEST_ID", "GuestID value", :attribute_name => :guest_id, :default => 'otherGuest'
   option "--name", "VM NAME", "Virtual Machine name (required)"
@@ -309,6 +311,11 @@ class CreateVMCommand < BaseCommand
     if disk_size and disk_file
       $stderr.puts "Both --disk-file and --disk-size specified. --disk-size will be ignored."
     end
+
+    if use_disk_template? && !disk_file
+      $stderr.puts "--use-disk-template requires that you specify a --disk-file"
+    end
+
     downloaded_file = nil
     if disk_file.nil?
       # if --disk-file nil? create the VM without disk
@@ -342,7 +349,8 @@ class CreateVMCommand < BaseCommand
       host.remote_command "mkdir /vmfs/volumes/#{datastore}/#{name}"
 
       begin
-        host.import_disk df, "/vmfs/volumes/#{datastore}/#{name}/#{name}.vmdk"
+        host.import_disk df, "/vmfs/volumes/#{datastore}/#{name}/#{name}.vmdk", false,
+          {use_template: use_disk_template?}
       rescue Exception => e
         $stderr.puts "Error uploading file to /vmfs/volumes/#{datastore}/#{name}/#{name}.vmdk"
         $stderr.puts e.message if debug?
