@@ -46,6 +46,7 @@ DEPENDENCIES
   jeweler
   net-scp
   net-ssh
+  nokogiri (= 1.5.5)
   rbvmomi
   rspec
   simplecov
