@@ -116,6 +116,7 @@ module ESX
     #   :datastore => datastore1 #(string, optional)
     #   :disk_file => path to vmdk inside datastore (optional)
     #   :disk_type => flat, sparse (default flat)
+	#   :hw_version => 8 #(int, optional)
     # }
     #
     # supported guest_id list:
@@ -127,6 +128,7 @@ module ESX
       spec[:cpus] = (specification[:cpus] || 1).to_i
       spec[:cpu_cores] = (specification[:cpu_cores] || 1).to_i
       spec[:guest_id] = specification[:guest_id] || 'otherGuest'
+	  spec[:hw_version] = (specification[:hw_version] || 8).to_i
       if specification[:disk_size]
         spec[:disk_size] = (specification[:disk_size].to_i * 1024)
       else
@@ -154,6 +156,7 @@ module ESX
                              :sharedBus => :noSharing)
           }
         ],
+		:version => 'vmx-'+spec[:hw_version].to_s.rjust(2,'0'),
         :extraConfig => [
           {
             :key => 'bios.bootOrder',
