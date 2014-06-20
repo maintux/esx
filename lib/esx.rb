@@ -111,11 +111,11 @@ module ESX
     #   :vm_name => name, (string, required)
     #   :cpus => 1, #(int, optional)
     #   :guest_id => 'otherGuest', #(string, optional)
-    #   :disk_size => 4096,  #(in MB, optional)
+    #   :disk_size => [4096],  #(in MB, optional)
     #   :memory => 128, #(in MB, optional)
     #   :datastore => datastore1 #(string, optional)
-    #   :disk_file => path to vmdk inside datastore (optional)
-    #   :disk_type => flat, sparse (default flat)
+    #   :disk_file => [path to vmdk inside datastore for each disk] (optional)
+    #   :disk_type => [flat, sparse] (default flat)
 	#   :hw_version => 8 #(int, optional)
     # }
     #
@@ -129,11 +129,19 @@ module ESX
       spec[:cpu_cores] = (specification[:cpu_cores] || 1).to_i
       spec[:guest_id] = specification[:guest_id] || 'otherGuest'
 	  spec[:hw_version] = (specification[:hw_version] || 8).to_i
-      if specification[:disk_size]
-        spec[:disk_size] = (specification[:disk_size].to_i * 1024)
+ 
+     if specification[:disk_size]
+        if specification[:disk_size].class != Array then specification[:disk_size] = [specification[:disk_size]] end # Allow for multiple or single disk
+	spec[:disk_size] = []
+	specification[:disk_size].each do |disk|
+          spec[:disk_size].push disk.to_i * 1024
+	end
       else
-        spec[:disk_size] = 4194304
-      end
+        spec[:disk_size] = []
+     end
+     if spec[:disk_file].class != Array then spec[:disk_file] = [spec[:disk_file]] end
+     if spec[:disk_type].class != Array then spec[:disk_type] = [spec[:disk_type]] end
+
       spec[:memory] = (specification[:memory] || 128).to_i
       if specification[:datastore]
         spec[:datastore] = "[#{specification[:datastore]}]"
@@ -165,9 +173,11 @@ module ESX
         ]
       }
 
-      #Add multiple nics
+      #Add nics
       nics_count = 0
       if spec[:nics]
+        if spec[:nics].class != Array then spec[:nics] = [spec[:nics]] end # Allow for multiple or single NIC 
+	
         spec[:nics].each do |nic_spec|
           vm_cfg[:deviceChange].push(
             {
@@ -179,11 +189,19 @@ module ESX
           nics_count += 1
         end
       end
-      # VMDK provided, replace the empty vmdk
-      vm_cfg[:deviceChange].push(create_disk_spec(:disk_file => spec[:disk_file],
-                                :disk_type => spec[:disk_type],
-                                :disk_size => spec[:disk_size],
-                                :datastore => spec[:datastore]))
+
+      # Add disks
+      disks_count = 0
+      [spec[:disk_file].count, spec[:disk_type].count, spec[:disk_size].count].max.times do |index|
+	vm_cfg[:deviceChange].push(create_disk_spec(:disk_file => spec[:disk_file][index],
+				    :disk_type => spec[:disk_type][index],
+				    :disk_size => spec[:disk_size][index] || 4194304,
+				    :datastore => spec[:datastore],
+				    :disks_count => disks_count
+				    ),
+				  )
+        disks_count += 1
+      end
 
       unless @free_license
         VM.wrap(@_datacenter.vmFolder.CreateVM_Task(:config => vm_cfg, :pool => @_datacenter.hostFolder.children.first.resourcePool).wait_for_completion,self)
@@ -265,6 +283,17 @@ module ESX
       array
     end
     private :recursive_virtual_machine
+
+    #
+    # Find a virtual machine on the Host. Returns nil if not found.
+    #
+    def get_vm(name)
+      vms = virtual_machines
+      vms.each do |vm|
+        if vm.name == name then return vm end
+      end
+      nil # not found :-(
+    end
 
     #
     # Run a command in the ESX host via SSH
@@ -391,24 +420,15 @@ module ESX
     #
     def import_disk_convert(source, destination, print_progress = false)
       tmp_dest = destination + ".tmp"
-      Net::SSH.start(@address, @user, :password => @password) do |ssh|
-        if not (ssh.exec! "ls #{destination} 2>/dev/null").nil?
-          raise Exception.new("Destination file #{destination} already exists")
-        end
-        Log.info "Uploading file... (#{File.basename(source)})" if print_progress
-        ssh.scp.upload!(source, tmp_dest) do |ch, name, sent, total|
-          if print_progress
-            print "\rProgress: #{(sent.to_f * 100 / total.to_f).to_i}%"
-          end
-        end
-        if print_progress
-          Log.info "Converting disk..."
-          ssh.exec "vmkfstools -i #{tmp_dest} --diskformat thin #{destination}; rm -f #{tmp_dest}"
-        else
-          ssh.exec "vmkfstools -i #{tmp_dest} --diskformat thin #{destination} >/dev/null 2>&1; rm -f #{tmp_dest}"
-        end
+      upload_file(source, destination, print_progress)
+      if print_progress
+        Log.info "Converting disk..."
+        remote_command "vmkfstools -i #{tmp_dest} --diskformat thin #{destination}; rm -f #{tmp_dest}"
+      else
+        remote_command "vmkfstools -i #{tmp_dest} --diskformat thin #{destination} >/dev/null 2>&1; rm -f #{tmp_dest}"
       end
     end
+
 
     def datacenter
       @_datacenter
@@ -428,6 +448,7 @@ module ESX
         raise Exception.new("Creating sparse disks in ESX is not supported. Use an existing image.")
       end
       disk_size = params[:disk_size]
+      disks_count = params[:disks_count] || 0
       datastore = params[:datastore]
       datastore = datastore + " #{disk_file}" if not disk_file.nil?
       spec = {}
@@ -440,7 +461,7 @@ module ESX
                                           :fileName => datastore,
                                           :diskMode => :persistent),
                            :controllerKey => 1000,
-                           :unitNumber => 0,
+                           :unitNumber => disks_count,
                            :capacityInKB => disk_size)
         }
       else
@@ -452,7 +473,7 @@ module ESX
                                           :fileName => datastore,
                                           :diskMode => :persistent),
                            :controllerKey => 1000,
-                           :unitNumber => 0,
+                           :unitNumber => disks_count,
                            :capacityInKB => disk_size)
         }
       end
