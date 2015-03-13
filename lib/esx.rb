@@ -29,7 +29,7 @@ module ESX
       @address = address
       @password = password
       @user = user
-      @templates_dir = opts[:templates_dir] || "/vmfs/volumes/datastore1/esx-gem/templates"
+      @templates_dir = opts[:templates_dir] || "/vmfs/volumes/#{opts[:datastore] || "datastore1"}/esx-gem/templates"
       @free_license = opts[:free_license] || false
       if @free_license and !@user.eql?"root"
         raise Exception.new("Can't use Free License mode with user #{@user}. Please use 'root' user.")

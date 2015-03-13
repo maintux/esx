@@ -301,7 +301,7 @@ class CreateVMCommand < BaseCommand
 
   def execute
     begin
-      host = ESX::Host.connect address, user, password, true, {:free_license=>free_license?}
+      host = ESX::Host.connect address, user, password, true, {:free_license => free_license?, :datastore => datastore}
     rescue Exception => e
       $stderr.puts "Can't connect to the host #{address}."
       if debug?
