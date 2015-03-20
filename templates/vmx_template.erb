@@ -9,11 +9,16 @@ memsize = "<%= spec[:memory] %>"
 scsi0.present = "true"
 scsi0.sharedBus = "none"
 scsi0.virtualDev = "lsilogic"
-scsi0:0.present = "true"
-scsi0:0.fileName = "<%= spec[:disk_file].split("/").last %>"
-scsi0:0.deviceType = "scsi-hardDisk"
+
+<% [spec[:disk_file].count, spec[:disk_type].count, spec[:disk_size].count].max.times do |index| %>
+scsi0:<%= index %>.present = "true"
+scsi0:<%= index %>.fileName = "<%= spec[:disk_file][index].split("/").last %>"
+scsi0:<%= index %>.deviceType = "scsi-hardDisk"
+<% end %>
+
 guestOS = "<%= spec[:guest_id] %>"
 floppy0.present = "FALSE"
+
 <% spec[:nics].each_with_index do |nic,index| %>
 ethernet<%= index %>.present = "true"
 ethernet<%= index %>.virtualDev = "e1000"
