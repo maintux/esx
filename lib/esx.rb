@@ -550,12 +550,23 @@ module ESX
       guest_info.ip_address
     end
 
+    #
+    # Shortcut to GuestInfo.host_name
+    #
+    def host_name
+      guest_info.host_name
+    end
+
     def nics
       list = []
       vm_object.config.hardware.device.grep(RbVmomi::VIM::VirtualEthernetCard).each do |n|
         list << NetworkInterface.wrap(n)
       end
       list
+    end
+
+    def rename(new_name)
+      vm_object.Rename_Task ({"newName" => new_name})
     end
 
   end
@@ -600,6 +611,10 @@ module ESX
 
     def ip_address
       _wrapped_object.ipAddress
+    end
+
+    def host_name
+      _wrapped_object.hostName
     end
 
     def nics
