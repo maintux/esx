@@ -1,4 +1,4 @@
-# ESX
+# ESX - NOTE: This project is no longer maintained.
 
 Simple rbvmomi wrapper to manage VMWare ESX hosts.
 
